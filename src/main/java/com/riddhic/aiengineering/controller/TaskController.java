@@ -1,5 +1,6 @@
 package com.riddhic.aiengineering.controller;
 
+import com.riddhic.aiengineering.dto.TaskRequest;
 import com.riddhic.aiengineering.dto.TaskResponse;
 import com.riddhic.aiengineering.model.Task;
 import com.riddhic.aiengineering.service.TaskService;
@@ -11,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
+
     private final TaskService taskService;
 
     public TaskController(TaskService taskService) {
@@ -18,29 +20,30 @@ public class TaskController {
     }
 
     @GetMapping
-    public List<Task> getTask() {
-        return taskService.getallTasks();
+    public List<TaskResponse> getAllTasks() {
+        return taskService.getAllTasks();
+    }
+
+    @GetMapping("/{id}")
+    public TaskResponse getTaskById(@PathVariable Long id) {
+        return taskService.getTaskById(id);
     }
 
     @PostMapping
-    public TaskResponse createTask(@Valid @RequestBody Task task) {
-        return taskService.createTask(task);
+    public TaskResponse createTask(@Valid @RequestBody TaskRequest request) {
+        return taskService.createTask(request);
     }
 
     @PutMapping("/{id}")
-    public TaskResponse updateTask(@PathVariable String id, @Valid @RequestBody Task task) {
-        return taskService.updateTask(id, task);
+    public TaskResponse updateTask(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskRequest request) {
+
+        return taskService.updateTask(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public Task deleteTask(@PathVariable String id) {
+    public TaskResponse deleteTask(@PathVariable Long id) {
         return taskService.deleteTask(id);
     }
-
-
-    @GetMapping("/{id}")
-    public Task getTaskById(@PathVariable String id) {
-        return taskService.getTaskbyId(id);
-    }
-
 }

@@ -11,6 +11,8 @@ public class TaskResponse {
     private String description;
     private TaskStatus status;
     private Priority priority;
+    private String createdAt;
+    private String updatedAt;
 
     public TaskResponse() {
     }
@@ -21,6 +23,8 @@ public class TaskResponse {
         this.description = task.getDescription();
         this.status = task.getStatus();
         this.priority = task.getPriority();
+        this.createdAt = task.getCreatedAt();
+        this.updatedAt = task.getUpdatedAt();
     }
 
     public Long getId() {
@@ -61,5 +65,21 @@ public class TaskResponse {
 
     public void setPriority(Priority priority) {
         this.priority = priority;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 }

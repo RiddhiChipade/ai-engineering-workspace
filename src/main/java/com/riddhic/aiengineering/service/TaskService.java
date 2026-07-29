@@ -6,6 +6,8 @@ import com.riddhic.aiengineering.enums.TaskStatus;
 import com.riddhic.aiengineering.exception.TaskNotFoundException;
 import com.riddhic.aiengineering.model.Task;
 import com.riddhic.aiengineering.repository.TaskRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 @Service
 public class TaskService {
 
+    private static final Logger log = LoggerFactory.getLogger(TaskService.class);
     private final TaskRepository taskRepository;
 
 
@@ -22,11 +25,12 @@ public class TaskService {
     }
 
     public List<TaskResponse> getAllTasks() {
+        TaskService.log.info("Fetching all tasks");
         return taskRepository.findAll().stream().map(TaskResponse::new).toList();
     }
 
     public TaskResponse getTaskById(Long id) {
-        System.out.println("Searching for task with id: " + id);
+        TaskService.log.info("Searching for task with id: " + id);
         return new TaskResponse(taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"))
         );
@@ -42,7 +46,7 @@ public class TaskService {
         task.setStatus(TaskStatus.TODO);
 
         taskRepository.save(task);
-
+        TaskService.log.info("Task created with id: " + task.getId());
         return new TaskResponse(task);
     }
 
@@ -56,7 +60,7 @@ public class TaskService {
         task.setPriority(request.getPriority());
 
         taskRepository.save(task);
-
+        TaskService.log.info("Task updated with id: " + task.getId());
         return new TaskResponse(task);
     }
 
@@ -66,6 +70,7 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"));
 
         taskRepository.delete(task);
+        TaskService.log.info("Task deleted with id: " + id);
 
         return new TaskResponse(task);
     }

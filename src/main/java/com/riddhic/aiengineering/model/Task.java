@@ -83,4 +83,12 @@ public class Task {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    public String getCreatedAt() {
+        return createdAt.toString();
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt.toString();
+    }
 }

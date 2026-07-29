@@ -5,28 +5,29 @@ import com.riddhic.aiengineering.dto.TaskResponse;
 import com.riddhic.aiengineering.enums.TaskStatus;
 import com.riddhic.aiengineering.exception.TaskNotFoundException;
 import com.riddhic.aiengineering.model.Task;
+import com.riddhic.aiengineering.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class TaskService {
 
-    private final List<Task> taskList = new ArrayList<>();
-    private Long nextId = 1L;
+    private final TaskRepository taskRepository;
+
+
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
     public List<TaskResponse> getAllTasks() {
-        return taskList.stream().map(TaskResponse::new).toList();
+        return taskRepository.findAll().stream().map(TaskResponse::new).toList();
     }
 
     public TaskResponse getTaskById(Long id) {
         System.out.println("Searching for task with id: " + id);
-        return new TaskResponse(taskList.stream()
-                .filter(task -> task.getId().equals(id))
-                .findFirst()
+        return new TaskResponse(taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"))
         );
     }
@@ -35,33 +36,36 @@ public class TaskService {
 
         Task task = new Task();
 
-        task.setId(nextId++);
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setPriority(request.getPriority());
         task.setStatus(TaskStatus.TODO);
 
-        taskList.add(task);
+        taskRepository.save(task);
 
         return new TaskResponse(task);
     }
 
     public TaskResponse updateTask(Long id, TaskRequest request) {
 
-        Task task = getTaskById(id);
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"));
 
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setPriority(request.getPriority());
+
+        taskRepository.save(task);
 
         return new TaskResponse(task);
     }
 
     public TaskResponse deleteTask(Long id) {
 
-        Task task = getTaskById(id);
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"));
 
-        taskList.remove(task);
+        taskRepository.delete(task);
 
         return new TaskResponse(task);
     }

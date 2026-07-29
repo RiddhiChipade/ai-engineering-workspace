@@ -1,15 +1,36 @@
 package com.riddhic.aiengineering.model;
 
+import jakarta.persistence.*;
 import com.riddhic.aiengineering.enums.Priority;
 import com.riddhic.aiengineering.enums.TaskStatus;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "tasks")
 public class Task {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
+
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
+
+    @Enumerated(EnumType.STRING)
     private Priority priority;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     public Task() {
     }
@@ -20,6 +41,7 @@ public class Task {
         this.description = description;
         this.status = status;
         this.priority = priority;
+
     }
 
     public Long getId() {

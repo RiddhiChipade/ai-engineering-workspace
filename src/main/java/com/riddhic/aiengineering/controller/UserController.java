@@ -3,6 +3,7 @@ package com.riddhic.aiengineering.controller;
 import com.riddhic.aiengineering.dto.UserResponse;
 import com.riddhic.aiengineering.dto.UserRequest;
 import com.riddhic.aiengineering.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,13 +34,12 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponse createUser(@RequestBody UserRequest userRequest) {
+    public UserResponse createUser(@Valid @RequestBody UserRequest userRequest) {
         return userService.createUser(userRequest);
     }
 
     @PutMapping("/{id}")
-    public UserResponse updateUser(@PathVariable Long id, @RequestBody UserRequest userRequest) {
-        // Assuming you have an updateUser method in your UserService
+    public UserResponse updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest) {
         return userService.updateUser(id, userRequest);
     }
 }

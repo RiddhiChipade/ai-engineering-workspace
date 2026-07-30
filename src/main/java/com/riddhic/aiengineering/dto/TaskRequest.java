@@ -1,5 +1,6 @@
 package com.riddhic.aiengineering.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.riddhic.aiengineering.enums.Priority;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,13 +17,17 @@ public class TaskRequest {
     @NotNull(message = "Priority is required")
     private Priority priority;
 
+    @JsonProperty("assignedUserId")
+    private Long assignedToId;
+
     public TaskRequest() {
     }
 
-    public TaskRequest(String title, String description, Priority priority) {
+    public TaskRequest(String title, String description, Priority priority, Long assignedToId) {
         this.title = title;
         this.description = description;
         this.priority = priority;
+        this.assignedToId = assignedToId;
     }
 
     public String getTitle() {
@@ -48,4 +53,13 @@ public class TaskRequest {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    public Long getAssignedToId() {
+        return assignedToId;
+    }
+
+    public void setAssignedToId(Long assignedToId) {
+        this.assignedToId = assignedToId;
+    }
+
 }

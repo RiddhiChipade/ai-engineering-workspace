@@ -11,7 +11,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TaskNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleTaskNotFoundException(TaskNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 404);
-        // Set error details in the response
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), 404);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 

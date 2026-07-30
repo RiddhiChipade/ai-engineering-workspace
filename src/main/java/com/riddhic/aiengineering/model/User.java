@@ -2,6 +2,9 @@ package com.riddhic.aiengineering.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -14,6 +17,9 @@ public class User {
 
     @Column(unique = true)
     private String email;
+
+    @OneToMany(mappedBy = "assignedTo")
+    private List<Task> tasks = new ArrayList<>();
 
     // Constructors
     public User() {
@@ -48,5 +54,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 }

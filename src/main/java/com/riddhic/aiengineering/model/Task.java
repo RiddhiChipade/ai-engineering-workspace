@@ -32,16 +32,20 @@ public class Task {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "assigned_to_id")
+    private User assignedTo;
+
     public Task() {
     }
 
-    public Task(Long id, String title, String description, TaskStatus status, Priority priority) {
+    public Task(Long id, String title, String description, TaskStatus status, Priority priority, User assignedTo) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.priority = priority;
-
+        this.assignedTo = assignedTo;
     }
 
     public Long getId() {
@@ -90,5 +94,13 @@ public class Task {
 
     public String getUpdatedAt() {
         return updatedAt.toString();
+    }
+
+    public User getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(User assignedTo) {
+        this.assignedTo = assignedTo;
     }
 }

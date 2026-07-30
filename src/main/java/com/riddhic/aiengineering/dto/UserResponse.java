@@ -1,5 +1,7 @@
 package com.riddhic.aiengineering.dto;
 
+import com.riddhic.aiengineering.model.User;
+
 public class UserResponse {
     private Long id;
     private String username;
@@ -9,6 +11,12 @@ public class UserResponse {
         this.id = id;
         this.username = username;
         this.email = email;
+    }
+
+    public UserResponse(User assignedTo) {
+        this.id = assignedTo.getId();
+        this.username = assignedTo.getUsername();
+        this.email = assignedTo.getEmail();
     }
 
     // Getters and setters

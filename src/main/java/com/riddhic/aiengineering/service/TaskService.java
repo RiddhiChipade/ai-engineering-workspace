@@ -2,7 +2,9 @@ package com.riddhic.aiengineering.service;
 
 import com.riddhic.aiengineering.dto.TaskRequest;
 import com.riddhic.aiengineering.dto.TaskResponse;
+import com.riddhic.aiengineering.dto.PaginatedResponse;
 import com.riddhic.aiengineering.enums.TaskStatus;
+import com.riddhic.aiengineering.enums.Priority;
 import com.riddhic.aiengineering.exception.TaskNotFoundException;
 import com.riddhic.aiengineering.exception.UserNotFoundException;
 import com.riddhic.aiengineering.model.Task;
@@ -11,6 +13,10 @@ import com.riddhic.aiengineering.repository.TaskRepository;
 import com.riddhic.aiengineering.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +38,53 @@ public class TaskService {
     public List<TaskResponse> getAllTasks() {
         log.info("Fetching all tasks");
         return taskRepository.findAll().stream().map(TaskResponse::new).toList();
+    }
+
+    public PaginatedResponse<TaskResponse> getFilteredTasks(
+            TaskStatus status,
+            Priority priority,
+            Long assignedUserId,
+            int page,
+            int size,
+            String sortBy,
+            String sortDirection) {
+        
+        log.info("Fetching filtered tasks - status: {}, priority: {}, assignedUserId: {}", status, priority, assignedUserId);
+
+        try {
+            Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+            String validSortBy = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
+            int validPage = Math.max(0, page);
+            int validSize = Math.max(1, size);
+
+            Pageable pageable = PageRequest.of(validPage, validSize, Sort.by(direction, validSortBy));
+
+            Page<Task> taskPage;
+
+            if (status != null && priority != null && assignedUserId != null) {
+                taskPage = taskRepository.findByStatusAndPriorityAndAssignedToId(status, priority, assignedUserId, pageable);
+            } else if (status != null && priority != null) {
+                taskPage = taskRepository.findByStatusAndPriority(status, priority, pageable);
+            } else if (status != null && assignedUserId != null) {
+                taskPage = taskRepository.findByStatusAndAssignedToId(status, assignedUserId, pageable);
+            } else if (priority != null && assignedUserId != null) {
+                taskPage = taskRepository.findByPriorityAndAssignedToId(priority, assignedUserId, pageable);
+            } else if (status != null) {
+                taskPage = taskRepository.findByStatus(status, pageable);
+            } else if (priority != null) {
+                taskPage = taskRepository.findByPriority(priority, pageable);
+            } else if (assignedUserId != null) {
+                taskPage = taskRepository.findByAssignedToId(assignedUserId, pageable);
+            } else {
+                taskPage = taskRepository.findAll(pageable);
+            }
+
+            List<TaskResponse> content = taskPage.getContent().stream().map(TaskResponse::new).toList();
+            return new PaginatedResponse<>(content, validPage, validSize, taskPage.getTotalPages(), taskPage.getTotalElements(), taskPage.isLast());
+        } catch (Exception e) {
+            log.error("Error fetching tasks", e);
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
     }
 
     public TaskResponse getTaskById(Long id) {

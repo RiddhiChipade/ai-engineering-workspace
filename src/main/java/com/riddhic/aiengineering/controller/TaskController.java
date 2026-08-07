@@ -29,9 +29,21 @@ public class TaskController {
             @RequestParam(required = false) Long assignedUserId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String sort, // accepts "field,dir"
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         
+        // support combined `sort=field,dir` (e.g. sort=createdAt,desc)
+        if (sort != null && !sort.isBlank()) {
+            String[] parts = sort.split(",");
+            if (parts.length >= 1 && parts[0] != null && !parts[0].isBlank()) {
+                sortBy = parts[0];
+            }
+            if (parts.length >= 2 && parts[1] != null && !parts[1].isBlank()) {
+                sortDirection = parts[1];
+            }
+        }
+
         TaskStatus taskStatus = null;
         if (status != null && !status.isBlank()) {
             taskStatus = TaskStatus.valueOf(status.toUpperCase());

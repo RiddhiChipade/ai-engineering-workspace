@@ -24,6 +24,7 @@ public class TaskController {
 
     @GetMapping
     public PaginatedResponse<TaskResponse> getTasks(
+            @RequestParam(required = false) String search,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String priority,
             @RequestParam(required = false) Long assignedUserId,
@@ -54,7 +55,7 @@ public class TaskController {
             taskPriority = Priority.valueOf(priority.toUpperCase());
         }
         
-        return taskService.getFilteredTasks(taskStatus, taskPriority, assignedUserId, page, size, sortBy, sortDirection);
+        return taskService.getFilteredTasks(search, taskStatus, taskPriority, assignedUserId, page, size, sortBy, sortDirection);
     }
 
     @GetMapping("/{id}")

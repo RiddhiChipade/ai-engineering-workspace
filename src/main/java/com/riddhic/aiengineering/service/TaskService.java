@@ -41,6 +41,7 @@ public class TaskService {
     }
 
     public PaginatedResponse<TaskResponse> getFilteredTasks(
+            String search,
             TaskStatus status,
             Priority priority,
             Long assignedUserId,
@@ -49,18 +50,38 @@ public class TaskService {
             String sortBy,
             String sortDirection) {
         
-        log.info("Fetching filtered tasks - status: {}, priority: {}, assignedUserId: {}", status, priority, assignedUserId);
+        log.info("Fetching filtered tasks - search: {}, status: {}, priority: {}, assignedUserId: {}", search, status, priority, assignedUserId);
 
-        try {
-            Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
-            String validSortBy = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
-            int validPage = Math.max(0, page);
-            int validSize = Math.max(1, size);
+        Sort.Direction direction = Sort.Direction.fromString(sortDirection.toUpperCase());
+        String validSortBy = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
+        int validPage = Math.max(0, page);
+        int validSize = Math.max(1, size);
 
-            Pageable pageable = PageRequest.of(validPage, validSize, Sort.by(direction, validSortBy));
+        Pageable pageable = PageRequest.of(validPage, validSize, Sort.by(direction, validSortBy));
 
-            Page<Task> taskPage;
+        Page<Task> taskPage;
 
+        boolean hasSearch = search != null && !search.isBlank();
+
+        if (hasSearch) {
+            if (status != null && priority != null && assignedUserId != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndStatusAndPriorityAndAssignedToId(search, status, priority, assignedUserId, pageable);
+            } else if (status != null && priority != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndStatusAndPriority(search, status, priority, pageable);
+            } else if (status != null && assignedUserId != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndStatusAndAssignedToId(search, status, assignedUserId, pageable);
+            } else if (priority != null && assignedUserId != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndPriorityAndAssignedToId(search, priority, assignedUserId, pageable);
+            } else if (status != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndStatus(search, status, pageable);
+            } else if (priority != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndPriority(search, priority, pageable);
+            } else if (assignedUserId != null) {
+                taskPage = taskRepository.searchByTitleOrDescriptionAndAssignedToId(search, assignedUserId, pageable);
+            } else {
+                taskPage = taskRepository.searchByTitleOrDescription(search, pageable);
+            }
+        } else {
             if (status != null && priority != null && assignedUserId != null) {
                 taskPage = taskRepository.findByStatusAndPriorityAndAssignedToId(status, priority, assignedUserId, pageable);
             } else if (status != null && priority != null) {
@@ -78,17 +99,14 @@ public class TaskService {
             } else {
                 taskPage = taskRepository.findAll(pageable);
             }
-
-            List<TaskResponse> content = taskPage.getContent().stream().map(TaskResponse::new).toList();
-            return new PaginatedResponse<>(content, validPage, validSize, taskPage.getTotalPages(), taskPage.getTotalElements(), taskPage.isLast());
-        } catch (Exception e) {
-            log.error("Error fetching tasks", e);
-            throw new RuntimeException("Error: " + e.getMessage());
         }
+
+        List<TaskResponse> content = taskPage.getContent().stream().map(TaskResponse::new).toList();
+        return new PaginatedResponse<>(content, validPage, validSize, taskPage.getTotalPages(), taskPage.getTotalElements(), taskPage.isLast());
     }
 
     public TaskResponse getTaskById(Long id) {
-        log.info("Searching for task with id: " + id);
+        log.info("Searching for task with id: {}", id);
         return new TaskResponse(taskRepository.findById(id)
                 .orElseThrow(() -> new TaskNotFoundException("Task with id " + id + " not found"))
         );

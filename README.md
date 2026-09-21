@@ -1,4 +1,4 @@
-# AI Engineering Workspace
+﻿# AI Engineering Workspace
 
 A Spring Boot 3.5.16 application with PostgreSQL persistence and REST endpoints for tasks.
 
@@ -46,6 +46,46 @@ This removes the local PostgreSQL volume and deletes stored data.
 ```powershell
 mvn test
 ```
+
+## Configuration
+
+The application reads environment variables for database, Redis, and server configuration.
+
+Required variables include:
+
+```text
+DB_HOST
+DB_PORT
+DB_NAME
+DB_USERNAME
+DB_PASSWORD
+REDIS_HOST
+REDIS_PORT
+SERVER_PORT
+SPRING_PROFILES_ACTIVE
+JWT_SECRET
+JWT_EXPIRATION
+```
+
+Local development uses the default `dev` profile. Docker uses the `docker` profile, which keeps PostgreSQL connectivity on the Compose service name `postgres` and Redis on the Compose service name `redis`.
+
+## Redis cache
+
+The application enables Spring Cache backed by Redis for the Task list query endpoint.
+
+- Cache name: `task-query`
+- TTL: 60 seconds
+- Cached data: filtered paginated Task list responses
+- Invalidation: create, update, and delete task operations clear the Task cache entries after a successful database mutation
+
+This keeps PostgreSQL as the source of truth while using Redis only as a read-through cache for the list endpoint.
+
+## Swagger / OpenAPI
+
+The API documentation is available at:
+
+- Swagger UI: http://localhost:8080/swagger-ui/index.html
+- OpenAPI JSON: http://localhost:8080/v3/api-docs
 
 ## CI/CD
 
@@ -109,3 +149,4 @@ PostgreSQL container
 ```
 
 The application connects to PostgreSQL using the Compose service name `postgres`, not `localhost`.
+

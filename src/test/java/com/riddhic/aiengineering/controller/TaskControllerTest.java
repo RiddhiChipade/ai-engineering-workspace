@@ -9,13 +9,18 @@ import com.riddhic.aiengineering.enums.TaskStatus;
 import com.riddhic.aiengineering.exception.TaskNotFoundException;
 import com.riddhic.aiengineering.model.Task;
 import com.riddhic.aiengineering.model.User;
+import com.riddhic.aiengineering.repository.UserRepository;
+import com.riddhic.aiengineering.service.CustomUserDetailsService;
+import com.riddhic.aiengineering.service.JwtService;
 import com.riddhic.aiengineering.service.TaskService;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.lang.reflect.Field;
@@ -36,6 +41,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TaskController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@WithMockUser(username = "dev", roles = "USER")
 class TaskControllerTest {
 
     @Autowired
@@ -46,6 +53,15 @@ class TaskControllerTest {
 
     @MockBean
     private TaskService taskService;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
+
+    @MockBean
+    private UserRepository userRepository;
 
     @Test
     void getTasks_shouldReturnEmptyList() throws Exception {
@@ -178,7 +194,7 @@ class TaskControllerTest {
     }
 
     @Test
-    void createTask_shouldReturnInternalServerErrorWhenRequestIsInvalid() throws Exception {
+    void createTask_shouldReturnBadRequestWhenRequestIsInvalid() throws Exception {
         // Arrange
         TaskRequest invalidRequest = new TaskRequest("", "Description", Priority.HIGH, null);
 
@@ -186,8 +202,9 @@ class TaskControllerTest {
         mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.statusCode").value(500));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Title cannot be blank"))
+                .andExpect(jsonPath("$.statusCode").value(400));
     }
 
     @Test

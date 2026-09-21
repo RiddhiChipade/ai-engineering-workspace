@@ -1,4 +1,4 @@
-services:
+﻿services:
   postgres:
     image: postgres:16-alpine
     container_name: ai-engineering-postgres
@@ -19,6 +19,24 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: ai-engineering-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 3s
+    restart: unless-stopped
+    networks:
+      - app-network
+
   app:
     build:
       context: .
@@ -27,12 +45,19 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       DB_HOST: postgres
       DB_PORT: ${DB_PORT:-5432}
       DB_NAME: ${POSTGRES_DB:-ai_engineering_workspace}
       DB_USERNAME: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-in-production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      REDIS_HOST: redis
+      REDIS_PORT: ${REDIS_PORT:-6379}
       SERVER_PORT: ${APP_PORT:-8080}
     ports:
       - "${APP_PORT:-8080}:8080"
@@ -46,4 +71,6 @@ networks:
 
 volumes:
   postgres_data:
+    driver: local
+  redis_data:
     driver: local

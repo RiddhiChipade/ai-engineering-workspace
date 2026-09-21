@@ -13,6 +13,8 @@ import com.riddhic.aiengineering.repository.TaskRepository;
 import com.riddhic.aiengineering.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ public class TaskService {
         return taskRepository.findAll().stream().map(TaskResponse::new).toList();
     }
 
+    @Cacheable(value = "task-query", key = "T(java.util.Objects).toString(#search) + ':' + T(java.util.Objects).toString(#status) + ':' + T(java.util.Objects).toString(#priority) + ':' + T(java.util.Objects).toString(#assignedUserId) + ':' + #page + ':' + #size + ':' + T(java.util.Objects).toString(#sortBy) + ':' + T(java.util.Objects).toString(#sortDirection)")
     public PaginatedResponse<TaskResponse> getFilteredTasks(
             String search,
             TaskStatus status,
@@ -112,6 +115,7 @@ public class TaskService {
         );
     }
 
+    @CacheEvict(value = "task-query", allEntries = true)
     public TaskResponse createTask(TaskRequest request) {
 
         Task task = new Task();
@@ -132,6 +136,7 @@ public class TaskService {
         return new TaskResponse(task);
     }
 
+    @CacheEvict(value = "task-query", allEntries = true)
     public TaskResponse updateTask(Long id, TaskRequest request) {
 
         Task task = taskRepository.findById(id)
@@ -154,6 +159,7 @@ public class TaskService {
         return new TaskResponse(task);
     }
 
+    @CacheEvict(value = "task-query", allEntries = true)
     public TaskResponse deleteTask(Long id) {
 
         Task task = taskRepository.findById(id)

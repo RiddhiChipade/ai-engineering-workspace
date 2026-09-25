@@ -11,6 +11,7 @@ import com.riddhic.aiengineering.model.Task;
 import com.riddhic.aiengineering.model.User;
 import com.riddhic.aiengineering.repository.TaskRepository;
 import com.riddhic.aiengineering.repository.UserRepository;
+import com.riddhic.aiengineering.service.TaskEventProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -30,11 +31,13 @@ public class TaskService {
     private static final Logger log = LoggerFactory.getLogger(TaskService.class);
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final TaskEventProducer taskEventProducer;
 
 
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, TaskEventProducer taskEventProducer) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.taskEventProducer = taskEventProducer;
     }
 
     public List<TaskResponse> getAllTasks() {
@@ -133,6 +136,14 @@ public class TaskService {
 
         task = taskRepository.save(task);
         log.info("Task created with id: " + task.getId());
+
+        // publish CREATED event after successful DB save
+        try {
+            taskEventProducer.publishTaskEvent(new com.riddhic.aiengineering.model.TaskEvent(com.riddhic.aiengineering.model.TaskEventType.CREATED, task.getId(), task.getTitle()));
+        } catch (Exception ex) {
+            log.error("Error publishing task created event for taskId={}", task.getId(), ex);
+        }
+
         return new TaskResponse(task);
     }
 
@@ -156,6 +167,14 @@ public class TaskService {
 
         task = taskRepository.save(task);
         log.info("Task updated with id: " + task.getId());
+
+        // publish UPDATED event
+        try {
+            taskEventProducer.publishTaskEvent(new com.riddhic.aiengineering.model.TaskEvent(com.riddhic.aiengineering.model.TaskEventType.UPDATED, task.getId(), task.getTitle()));
+        } catch (Exception ex) {
+            log.error("Error publishing task updated event for taskId={}", task.getId(), ex);
+        }
+
         return new TaskResponse(task);
     }
 
@@ -167,6 +186,13 @@ public class TaskService {
 
         taskRepository.delete(task);
         log.info("Task deleted with id: " + id);
+
+        // publish DELETED event
+        try {
+            taskEventProducer.publishTaskEvent(new com.riddhic.aiengineering.model.TaskEvent(com.riddhic.aiengineering.model.TaskEventType.DELETED, task.getId(), task.getTitle()));
+        } catch (Exception ex) {
+            log.error("Error publishing task deleted event for taskId={}", task.getId(), ex);
+        }
 
         return new TaskResponse(task);
     }

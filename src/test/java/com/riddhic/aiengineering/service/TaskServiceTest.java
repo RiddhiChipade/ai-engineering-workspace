@@ -46,6 +46,9 @@ class TaskServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private com.riddhic.aiengineering.service.TaskEventProducer taskEventProducer;
+
     @InjectMocks
     private TaskService taskService;
 
@@ -88,6 +91,7 @@ class TaskServiceTest {
         assertEquals(TaskStatus.TODO, response.getStatus());
         assertEquals(Priority.HIGH, response.getPriority());
         assertNull(response.getAssignedTo());
+        verify(taskEventProducer).publishTaskEvent(any());
     }
 
     @Test
@@ -132,6 +136,7 @@ class TaskServiceTest {
 
         verify(userRepository).findById(1L);
         verify(taskRepository).save(any(Task.class));
+        verify(taskEventProducer).publishTaskEvent(any());
     }
 
     @Test
@@ -153,6 +158,7 @@ class TaskServiceTest {
 
         // Verify
         verify(taskRepository, never()).save(any(Task.class));
+        verify(taskEventProducer, never()).publishTaskEvent(any());
     }
 
     @Test
@@ -229,6 +235,7 @@ class TaskServiceTest {
         // Verify
         verify(taskRepository).findById(id);
         verify(taskRepository).save(any(Task.class));
+        verify(taskEventProducer).publishTaskEvent(any());
     }
 
     @Test
@@ -704,6 +711,7 @@ class TaskServiceTest {
         // Verify
         verify(taskRepository).findById(taskId);
         verify(taskRepository).delete(savedTask);
+        verify(taskEventProducer).publishTaskEvent(any());
     }
 
     @Test
@@ -722,6 +730,7 @@ class TaskServiceTest {
         // Verify
         verify(taskRepository).findById(taskId);
         verify(taskRepository, never()).delete(any(Task.class));
+        verify(taskEventProducer, never()).publishTaskEvent(any());
     }
 
     private void setFieldValue(Object target, String fieldName, Object value) throws Exception {

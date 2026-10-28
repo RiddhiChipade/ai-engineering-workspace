@@ -3,6 +3,7 @@ package com.riddhic.aiengineering.service;
 import com.riddhic.aiengineering.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -29,6 +30,7 @@ public class JwtService {
             @Value("${jwt.secret:${JWT_SECRET:dev-secret-key-change-me}}") String secret,
             @Value("${jwt.expiration:${JWT_EXPIRATION:3600000}}") long expirationMs) {
         this.secretKey = io.jsonwebtoken.security.Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+        if (expirationMs <= 0) throw new IllegalArgumentException("jwt.expiration must be positive");
         this.expirationMs = expirationMs;
     }
 
@@ -60,10 +62,7 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token);
             return true;
-        } catch (ExpiredJwtException e) {
-            log.warn("JWT expired: {}", e.getMessage());
-            return false;
-        } catch (MalformedJwtException | SignatureException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             log.warn("JWT validation failed: {}", e.getMessage());
             return false;
         }

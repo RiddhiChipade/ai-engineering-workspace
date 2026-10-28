@@ -127,9 +127,9 @@ class TaskControllerTest {
     void getTasks_shouldReturnBadRequestForInvalidEnumValues() throws Exception {
         // Act + Assert
         mockMvc.perform(get("/tasks").param("status", "INVALID"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message", containsString("No enum constant")))
-                .andExpect(jsonPath("$.statusCode").value(500));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(containsString("Invalid request")))
+                .andExpect(jsonPath("$.statusCode").value(400));
     }
 
     @Test
@@ -147,7 +147,8 @@ class TaskControllerTest {
                 .andExpect(jsonPath("$.status").value("TODO"))
                 .andExpect(jsonPath("$.priority").value("HIGH"))
                 .andExpect(jsonPath("$.assignedTo.id").value(2))
-                .andExpect(jsonPath("$.assignedTo.username").value("dev"));
+                .andExpect(jsonPath("$.assignedTo.username").value("dev"))
+                .andExpect(jsonPath("$.assignedTo.password").doesNotExist());
 
         verify(taskService).getTaskById(1L);
     }
@@ -203,18 +204,18 @@ class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Title cannot be blank"))
+                .andExpect(jsonPath("$.message").value(containsString("Title cannot be blank")))
                 .andExpect(jsonPath("$.statusCode").value(400));
     }
 
     @Test
-    void createTask_shouldReturnInternalServerErrorWhenJsonIsMalformed() throws Exception {
+    void createTask_shouldReturnBadRequestWhenJsonIsMalformed() throws Exception {
         // Act + Assert
         mockMvc.perform(post("/tasks")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{bad json"))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.statusCode").value(500));
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.statusCode").value(400));
     }
 
     @Test

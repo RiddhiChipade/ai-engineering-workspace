@@ -9,8 +9,6 @@ import com.riddhic.aiengineering.model.User;
 import com.riddhic.aiengineering.repository.TaskRepository;
 import com.riddhic.aiengineering.repository.UserRepository;
 import com.riddhic.aiengineering.service.TaskService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,6 +23,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
@@ -39,8 +39,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @SpringBootTest
+@Testcontainers(disabledWithoutDocker = true)
 class TaskCachingIntegrationTest {
 
+    @Container
     private static final GenericContainer<?> REDIS_CONTAINER =
             new GenericContainer<>(DockerImageName.parse("redis:7-alpine"))
                     .withExposedPorts(6379);
@@ -69,16 +71,6 @@ class TaskCachingIntegrationTest {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-    @BeforeAll
-    static void startRedis() {
-        REDIS_CONTAINER.start();
-    }
-
-    @AfterAll
-    static void stopRedis() {
-        REDIS_CONTAINER.stop();
-    }
 
     @BeforeEach
     void setUp() {

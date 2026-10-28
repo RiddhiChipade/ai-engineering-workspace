@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7fb">
+  <meta name="description" content="A clear, calm space to manage your work.">
+  <title>Dayline — Task workspace</title>
+  <link rel="stylesheet" href="/assets/app.css">
+  <script src="/assets/app.js" defer></script>
+</head>
+<body>
+  <main id="auth-view" class="auth-shell">
+    <section class="auth-story">
+      <a class="brand brand-light" href="/" aria-label="Dayline home">
+        <span class="brand-mark"><span></span><span></span><span></span></span>
+        <span>dayline</span>
+      </a>
+      <div class="story-copy">
+        <p class="eyebrow">YOUR WORK, IN RHYTHM</p>
+        <h1>Make room for<br><em>meaningful work.</em></h1>
+        <p>A thoughtful home for the things you want to move forward.</p>
+      </div>
+      <div class="story-art" aria-hidden="true">
+        <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+        <div class="art-card art-card-back"><span class="art-dot"></span><span class="art-line"></span></div>
+        <div class="art-card art-card-front"><span class="art-check">✓</span><span class="art-line long"></span><span class="art-line short"></span><span class="art-tag">IN PROGRESS</span></div>
+        <div class="art-spark spark-one">✳</div><div class="art-spark spark-two">✦</div>
+      </div>
+      <p class="story-foot">A little progress, every day.</p>
+    </section>
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="mobile-brand brand">
+          <span class="brand-mark"><span></span><span></span><span></span></span><span>dayline</span>
+        </div>
+        <p class="eyebrow" id="auth-eyebrow">WELCOME BACK</p>
+        <h2 id="auth-title">Sign in to your workspace</h2>
+        <p class="auth-subtitle" id="auth-subtitle">Pick up where you left off.</p>
+        <div id="auth-error" class="form-error" role="alert" hidden></div>
+        <form id="auth-form" class="auth-form">
+          <label id="username-label">Username
+            <input name="username" autocomplete="username" required minlength="3" maxlength="50" placeholder="Your username">
+          </label>
+          <label id="email-label" hidden>Email address
+            <input name="email" type="email" autocomplete="email" maxlength="254" placeholder="you@example.com">
+          </label>
+          <label>Password
+            <input name="password" type="password" autocomplete="current-password" required minlength="8" placeholder="At least 8 characters">
+          </label>
+          <button id="auth-submit" class="button button-primary button-wide" type="submit">Sign in <span aria-hidden="true">→</span></button>
+        </form>
+        <p class="auth-switch"><span id="switch-copy">New to Dayline?</span> <button id="auth-switch" class="text-button" type="button">Create an account</button></p>
+        <p class="auth-note">Your workspace is private to your account.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="workspace" class="workspace" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Dayline home">
+        <span class="brand-mark"><span></span><span></span><span></span></span><span>dayline</span>
+      </a>
+      <div class="side-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Task views">
+        <button class="nav-item active" data-status="" type="button"><span class="nav-icon">▦</span><span>All tasks</span><span class="nav-count" id="nav-all-count">—</span></button>
+        <button class="nav-item" data-status="TODO" type="button"><span class="nav-icon">◷</span><span>To do</span><span class="nav-count" id="nav-todo-count">—</span></button>
+        <button class="nav-item" data-status="IN_PROGRESS" type="button"><span class="nav-icon">◒</span><span>In progress</span></button>
+        <button class="nav-item" data-status="DONE" type="button"><span class="nav-icon">✓</span><span>Completed</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-tip">
+        <span class="tip-mark">✦</span>
+        <strong>Small steps add up.</strong>
+        <p>Focus on what matters today. The rest can wait.</p>
+      </div>
+      <a class="side-link" href="/swagger-ui/index.html" target="_blank" rel="noreferrer"><span class="nav-icon">↗</span> API documentation</a>
+      <div class="sidebar-footer"><span class="online-dot"></span> Private workspace</div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><span class="crumb-sep">/</span><strong id="view-label">All tasks</strong></div>
+        <div class="top-actions">
+          <span class="today-label" id="today-label"></span>
+          <div class="avatar" id="user-avatar" aria-hidden="true">U</div>
+          <div class="user-meta"><strong id="user-name">User</strong><span id="user-role">MEMBER</span></div>
+          <button id="logout-button" class="icon-button logout-button" type="button" aria-label="Sign out" title="Sign out">↗</button>
+        </div>
+      </header>
+
+      <section class="page-content">
+        <div class="welcome-row">
+          <div>
+            <p class="eyebrow" id="welcome-date">YOUR OVERVIEW</p>
+            <h1 id="welcome-title">Good morning.</h1>
+            <p class="page-subtitle">A clear view of what’s moving and what’s next.</p>
+          </div>
+          <button id="new-task-button" class="button button-primary"><span class="plus">＋</span> New task</button>
+        </div>
+
+        <section class="stats-grid" aria-label="Task summary">
+          <article class="stat-card stat-card-dark"><div class="stat-top"><span>Open tasks</span><span class="stat-icon">◷</span></div><strong id="stat-open">—</strong><span class="stat-caption">Ready for your attention</span><div class="stat-accent"></div></article>
+          <article class="stat-card"><div class="stat-top"><span>In progress</span><span class="stat-icon accent-indigo">◒</span></div><strong id="stat-progress">—</strong><span class="stat-caption">Work already in motion</span></article>
+          <article class="stat-card"><div class="stat-top"><span>Completed</span><span class="stat-icon accent-green">✓</span></div><strong id="stat-done">—</strong><span class="stat-caption">Nice work getting these done</span></article>
+          <article class="stat-card"><div class="stat-top"><span>All tasks</span><span class="stat-icon accent-orange">▦</span></div><strong id="stat-total">—</strong><span class="stat-caption">Across your workspace</span></article>
+        </section>
+
+        <section class="tasks-panel">
+          <div class="tasks-heading">
+            <div><p class="eyebrow">YOUR LIST</p><h2 id="list-title">All tasks <span id="list-count" class="title-count"></span></h2></div>
+            <div class="list-tools">
+              <label class="search-box"><span aria-hidden="true">⌕</span><input id="search-input" type="search" maxlength="200" placeholder="Search tasks…" aria-label="Search tasks"></label>
+              <label class="select-wrap"><span class="sr-only">Filter by priority</span><select id="priority-filter"><option value="">All priorities</option><option value="HIGH">High priority</option><option value="MEDIUM">Medium priority</option><option value="LOW">Low priority</option></select></label>
+            </div>
+          </div>
+          <div class="list-columns" aria-hidden="true"><span>TASK</span><span>PRIORITY</span><span>DUE DATE</span><span>STATUS</span><span></span></div>
+          <div id="task-list" class="task-list" aria-live="polite"></div>
+          <div id="empty-state" class="empty-state" hidden><div class="empty-illustration"><span>✓</span></div><h3 id="empty-title">A clean slate.</h3><p id="empty-copy">Add a task when something needs your attention.</p><button id="empty-new-button" class="button button-soft" type="button">Create your first task</button></div>
+          <div id="loading-state" class="loading-state"><span class="spinner"></span><span>Loading your tasks…</span></div>
+          <div class="list-footer"><span id="page-summary">—</span><div class="pagination"><button id="prev-page" class="icon-button" type="button" aria-label="Previous page" disabled>←</button><span id="page-number">1</span><button id="next-page" class="icon-button" type="button" aria-label="Next page" disabled>→</button></div></div>
+        </section>
+        <footer class="page-footer"><span>Make today count.</span><span>DAYLINE <i>·</i> TASK WORKSPACE</span></footer>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="task-dialog" class="task-dialog">
+    <form id="task-form" method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">TASK DETAILS</p><h2 id="dialog-title">Create a task</h2></div><button id="close-dialog" class="icon-button" type="button" aria-label="Close">×</button></div>
+      <div id="task-error" class="form-error" role="alert" hidden></div>
+      <label class="field-label">Task title <span class="required-mark">*</span><input name="title" required maxlength="200" placeholder="What needs to get done?"></label>
+      <label class="field-label">Description <span class="optional-mark">OPTIONAL</span><textarea name="description" maxlength="500" rows="3" placeholder="Add a few details…"></textarea></label>
+      <div class="field-row">
+        <label class="field-label">Priority<select name="priority" required><option value="MEDIUM">Medium</option><option value="HIGH">High</option><option value="LOW">Low</option></select></label>
+        <label class="field-label">Status<select name="status"><option value="TODO">To do</option><option value="IN_PROGRESS">In progress</option><option value="DONE">Completed</option></select></label>
+      </div>
+      <div class="field-row">
+        <label class="field-label">Due date <span class="optional-mark">OPTIONAL</span><input name="dueDate" type="date"></label>
+        <label id="assignee-field" class="field-label" hidden>Assign to<select name="assignedUserId"><option value="">Unassigned</option></select></label>
+      </div>
+      <div class="dialog-actions"><button id="cancel-task" class="button button-soft" type="button">Cancel</button><button id="save-task" class="button button-primary" type="submit">Create task</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

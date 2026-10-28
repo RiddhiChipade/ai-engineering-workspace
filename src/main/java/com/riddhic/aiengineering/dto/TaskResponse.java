@@ -3,6 +3,7 @@ package com.riddhic.aiengineering.dto;
 import com.riddhic.aiengineering.enums.Priority;
 import com.riddhic.aiengineering.enums.TaskStatus;
 import com.riddhic.aiengineering.model.Task;
+import java.time.LocalDate;
 
 public class TaskResponse {
 
@@ -11,6 +12,7 @@ public class TaskResponse {
     private String description;
     private TaskStatus status;
     private Priority priority;
+    private LocalDate dueDate;
     private String createdAt;
     private String updatedAt;
     private UserResponse assignedTo;
@@ -24,6 +26,7 @@ public class TaskResponse {
         this.description = task.getDescription();
         this.status = task.getStatus();
         this.priority = task.getPriority();
+        this.dueDate = task.getDueDate();
         this.createdAt = task.getCreatedAt();
         this.updatedAt = task.getUpdatedAt();
         this.assignedTo = task.getAssignedTo() != null ? new UserResponse(task.getAssignedTo()) : null;
@@ -68,6 +71,9 @@ public class TaskResponse {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    public LocalDate getDueDate() { return dueDate; }
+    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 
     public String getCreatedAt() {
         return createdAt;

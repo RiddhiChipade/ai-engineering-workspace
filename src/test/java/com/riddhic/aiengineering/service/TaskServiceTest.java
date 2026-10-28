@@ -635,33 +635,15 @@ class TaskServiceTest {
     }
 
     @Test
-    void getFilteredTasks_shouldHandleZeroOrNegativePage() {
-        // Arrange
-        Page<Task> page = new PageImpl<>(List.of(savedTask), PageRequest.of(0, 10), 1);
-        when(taskRepository.findAll(any(Pageable.class))).thenReturn(page);
-
-        // Act
-        taskService.getFilteredTasks(null, null, null, null, -5, 10, "id", "asc");
-
-        // Verify
-        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(taskRepository).findAll(pageableCaptor.capture());
-        assertEquals(0, pageableCaptor.getValue().getPageNumber());
+    void getFilteredTasks_shouldRejectNegativePage() {
+        assertThrows(IllegalArgumentException.class,
+                () -> taskService.getFilteredTasks(null, null, null, null, -1, 10, "id", "asc"));
     }
 
     @Test
-    void getFilteredTasks_shouldHandleInvalidPageSize() {
-        // Arrange
-        Page<Task> page = new PageImpl<>(List.of(savedTask), PageRequest.of(0, 1), 1);
-        when(taskRepository.findAll(any(Pageable.class))).thenReturn(page);
-
-        // Act
-        taskService.getFilteredTasks(null, null, null, null, 0, -3, "id", "asc");
-
-        // Verify
-        ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
-        verify(taskRepository).findAll(pageableCaptor.capture());
-        assertEquals(1, pageableCaptor.getValue().getPageSize());
+    void getFilteredTasks_shouldRejectInvalidPageSize() {
+        assertThrows(IllegalArgumentException.class,
+                () -> taskService.getFilteredTasks(null, null, null, null, 0, 101, "id", "asc"));
     }
 
     @Test

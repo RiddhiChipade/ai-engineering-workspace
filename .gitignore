@@ -4,9 +4,6 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-.env
-.env.*
-!.env.example
 
 *.log
 
@@ -37,3 +34,6 @@ build/
 
 ### VS Code ###
 .vscode/
+.env
+.env.*
+!.env.example

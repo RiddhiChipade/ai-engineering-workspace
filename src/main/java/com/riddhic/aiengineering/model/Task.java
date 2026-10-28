@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tasks")
@@ -25,6 +26,9 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -87,6 +91,9 @@ public class Task {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
+
+    public LocalDate getDueDate() { return dueDate; }
+    public void setDueDate(LocalDate dueDate) { this.dueDate = dueDate; }
 
     public String getCreatedAt() {
         return createdAt.toString();

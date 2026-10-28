@@ -3,6 +3,7 @@ package com.riddhic.aiengineering.repository;
 import com.riddhic.aiengineering.model.Task;
 import com.riddhic.aiengineering.enums.TaskStatus;
 import com.riddhic.aiengineering.enums.Priority;
+import com.riddhic.aiengineering.enums.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.query.Param;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
+
+    Page<Task> findByAssignedToIdAndStatusIn(Long userId, java.util.Collection<TaskStatus> statuses, Pageable pageable);
+
+    Page<Task> findByAssignedToIdAndDueDateBeforeAndStatusNot(Long userId, java.time.LocalDate dueDate, TaskStatus status, Pageable pageable);
     
     Page<Task> findByStatus(TaskStatus status, Pageable pageable);
     

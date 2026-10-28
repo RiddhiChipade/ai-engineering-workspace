@@ -14,9 +14,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Validated
 @RequestMapping("/tasks")
 @Tag(name = "Tasks", description = "Task CRUD and filtering operations")
 public class TaskController {
@@ -41,8 +45,8 @@ public class TaskController {
             @Parameter(description = "Task status filter", example = "TODO") @RequestParam(required = false) String status,
             @Parameter(description = "Priority filter", example = "HIGH") @RequestParam(required = false) String priority,
             @Parameter(description = "Assigned user ID filter") @RequestParam(required = false) Long assignedUserId,
-            @Parameter(description = "Page number", example = "0") @RequestParam(defaultValue = "0") int page,
-            @Parameter(description = "Page size", example = "10") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Page number", example = "0") @Min(0) @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size (1 to 100)", example = "10") @Min(1) @Max(100) @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "Sort field and direction in the form field,dir (for example createdAt,desc)") @RequestParam(required = false) String sort,
             @Parameter(description = "Sort field", example = "id") @RequestParam(defaultValue = "id") String sortBy,
             @Parameter(description = "Sort direction", example = "asc") @RequestParam(defaultValue = "asc") String sortDirection) {
@@ -56,6 +60,7 @@ public class TaskController {
             if (parts.length >= 2 && parts[1] != null && !parts[1].isBlank()) {
                 sortDirection = parts[1];
             }
+            if (parts.length > 2) throw new IllegalArgumentException("sort must use the form field,direction");
         }
 
         TaskStatus taskStatus = null;

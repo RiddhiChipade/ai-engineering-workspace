@@ -7,10 +7,12 @@ import com.riddhic.aiengineering.dto.PaginatedResponse;
 import com.riddhic.aiengineering.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/users")
 public class UserController {
 
